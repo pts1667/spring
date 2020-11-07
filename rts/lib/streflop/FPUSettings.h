@@ -50,6 +50,8 @@
 #include "softfloat/softfloat.h"
 #endif
 
+#include "FPUSettingsASM.h"
+
 namespace streflop {
 
 // We do not use libm, so let's copy a few flags and C99 functions from fenv.h
@@ -132,10 +134,10 @@ enum FPU_RoundMode {
 
 // plan for portability
 #if defined(_MSC_VER)
-#define STREFLOP_FSTCW(cw) do { short tmp; __asm { fstcw tmp }; (cw) = tmp; } while (0)
-#define STREFLOP_FLDCW(cw) do { short tmp = (cw); __asm { fclex }; __asm { fldcw tmp }; } while (0)
-#define STREFLOP_STMXCSR(cw) do { int tmp; __asm { stmxcsr tmp }; (cw) = tmp; } while (0)
-#define STREFLOP_LDMXCSR(cw) do { int tmp = (cw); __asm { ldmxcsr tmp }; } while (0)
+#define STREFLOP_FSTCW(cw) do { _streflop_fstcw((short*) &(cw)); } while (0)
+#define STREFLOP_FLDCW(cw) do { _streflop_fldcw((short*) &(cw)); } while (0)
+#define STREFLOP_STMXCSR(cw) do { _streflop_stmxcsr((int*) &(cw)); } while (0)
+#define STREFLOP_LDMXCSR(cw) do { _streflop_ldmxcsr((int*) &(cw)); } while (0)
 #else
 #define STREFLOP_FSTCW(cw) do { asm volatile ("fstcw %0" : "=m" (cw) : ); } while (0)
 #define STREFLOP_FLDCW(cw) do { asm volatile ("fclex \n fldcw %0" : : "m" (cw)); } while (0)
@@ -147,8 +149,8 @@ enum FPU_RoundMode {
 
 #if defined(STREFLOP_X87)
 
-/// Raise exception for these flags
-inline int feraiseexcept(FPU_Exceptions excepts) {
+        /// Raise exception for these flags
+        inline int feraiseexcept(FPU_Exceptions excepts) {
     unsigned short fpu_mode;
     STREFLOP_FSTCW(fpu_mode);
     fpu_mode &= ~( excepts ); // generate error for selection

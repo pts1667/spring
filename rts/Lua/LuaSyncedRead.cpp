@@ -76,6 +76,9 @@
 
 #include <cctype>
 
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#endif
 
 using std::min;
 using std::max;

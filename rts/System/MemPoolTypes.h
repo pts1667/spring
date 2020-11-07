@@ -15,6 +15,7 @@
 #include "System/UnorderedMap.hpp"
 #include "System/ContainerUtil.h"
 #include "System/SafeUtil.h"
+#include "System/CompileSizeChecker.h"
 
 template<size_t S> struct DynMemPool {
 public:
@@ -110,7 +111,7 @@ private:
 template<size_t S, size_t N, size_t K> struct FixedDynMemPool {
 public:
 	template<typename T, typename... A> T* alloc(A&&... a) {
-		static_assert(sizeof(T) <= PAGE_SIZE(), "");
+		CompileSizeChecker<T, decltype(PAGE_SIZE()), sizeof(T), PAGE_SIZE()>::MustBeLessThan();
 		return (new (allocMem(sizeof(T))) T(std::forward<A>(a)...));
 	}
 

@@ -3,7 +3,7 @@
 #include "System/StringUtil.h"
 #include "System/bitops.h"
 
-#include <zlib.h>
+#include "zlib.h"
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1310)
 	#include <intrin.h>

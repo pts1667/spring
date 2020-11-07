@@ -42,18 +42,26 @@ if    (NOT NO_SOUND)
 			OpenAL/VorbisShared.cpp
 		)
 
-	find_package_static(OpenAL REQUIRED)
+	find_vcpkg_static(OpenAL OPENAL_LIBRARY_VCPKG)
 	include_directories(${OPENAL_INCLUDE_DIR})
-	find_package_static(OggVorbis REQUIRED)
+	if (NOT MSVC)
+		find_package_static(OggVorbis)
+	endif()
+
+	if(NOT OGGVORBIS_FOUND)
+		find_vcpkg_static(Vorbis VORBIS_LIBRARY_VCPKG)
+		find_vcpkg_static(Ogg OGG_LIBRARY_VCPKG)
+	endif()
 	include_directories(${OGG_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR})
 
-	find_package(SDL2 REQUIRED)
+	find_vcpkg(SDL2 SDL_LIBRARY_VCPKG)
 	include_directories(${SDL2_INCLUDE_DIR})
 
 	include_directories(${CMAKE_SOURCE_DIR}/include/)
 	include_directories(${CMAKE_SOURCE_DIR}/include/AL)
 
 	add_library(sound STATIC EXCLUDE_FROM_ALL ${soundSources})
-	target_link_libraries(sound ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
-	target_link_libraries(sound ${OPENAL_LIBRARY})
+	find_libs_for_vcpkg(sound)
+	target_link_libraries(sound PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
+	target_link_libraries(sound PRIVATE ${OPENAL_LIBRARY})
 endif (NOT NO_SOUND)

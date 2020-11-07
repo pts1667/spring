@@ -106,8 +106,8 @@ void CProjectileHandler::Init()
 			freeProjectileIDs[false].push_back(i);
 		}
 
-		std::random_shuffle(freeProjectileIDs[ true].begin(), freeProjectileIDs[ true].end(), gsRNG);
-		std::random_shuffle(freeProjectileIDs[false].begin(), freeProjectileIDs[false].end(), guRNG);
+		std::shuffle(freeProjectileIDs[ true].begin(), freeProjectileIDs[ true].end(), gsRNG);
+		std::shuffle(freeProjectileIDs[false].begin(), freeProjectileIDs[false].end(), guRNG);
 	}
 
 	for (int modelType = 0; modelType < MODELTYPE_OTHER; ++modelType) {
@@ -395,7 +395,8 @@ void CProjectileHandler::AddProjectile(CProjectile* p)
 
 			// generate (newSize - oldSize) new id's starting from oldSize
 			std::for_each(freeIDs.begin(), freeIDs.end(), [k = oldSize](int& id) mutable { id = k++; });
-			std::random_shuffle(freeIDs.begin(), freeIDs.end(), rngFunc);
+			p->synced ? std::shuffle(freeIDs.begin(), freeIDs.end(), gsRNG) : 
+									std::shuffle(freeIDs.begin(), freeIDs.end(), guRNG);
 		}
 
 

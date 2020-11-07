@@ -65,8 +65,12 @@ macro    (ai_message type msg)
 	endif (NOT AI_FIND_QUIETLY)
 endmacro (ai_message type msg)
 
-
-find_package(AWK)
+# We assume AWK is in PATH
+if (VCPKG_TOOLCHAIN)
+	set(AWK_BIN "awk")
+else()
+	find_package(AWK)
+endif()
 
 # CUtils has to come first, because the Interfaces use it too
 add_subdirectory(Wrappers/CUtils)

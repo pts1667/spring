@@ -3,7 +3,7 @@
 set(MINIZIP_FIND_QUIETLY TRUE)
 FIND_PACKAGE_STATIC(MiniZip)
 
-if     (MINIZIP_FOUND)
+if     (MINIZIP_FOUND OR MSVC)
 	# Use the system supplied MiniZip library
 	message(STATUS "Using minizip library: ${MINIZIP_LIBRARY}")
 
@@ -18,10 +18,11 @@ else   (MINIZIP_FOUND)
 		)
 
 	add_definitions(-DNOCRYPT -DNOUNCRYPT)
-	find_package(ZLIB REQUIRED)
+	find_vcpkg(ZLIB ZLIB_LIBRARY_VCPKG)
 
 	add_library(minizip STATIC EXCLUDE_FROM_ALL ${miniZipSources})
-	target_link_libraries(minizip ${ZLIB_LIBRARY})
+	find_libs_for_vcpkg(minizip)
+	target_link_libraries(minizip PRIVATE ${ZLIB_LIBRARY})
 	set_target_properties(minizip PROPERTIES COMPILE_FLAGS "${PIC_FLAG}")
 
 	set_global(SPRING_MINIZIP_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/rts/lib")

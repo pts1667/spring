@@ -9,17 +9,18 @@
 
 #include "Sim/Units/Unit.h"
 #include "Sim/Units/UnitDef.h"
+#include "System/CompileSizeChecker.h"
 
 void MoveTypeFactory::InitStatic() {
-	static_assert(sizeof(CGroundMoveType) >= sizeof(CStrafeAirMoveType), "");
-	static_assert(sizeof(CGroundMoveType) >= sizeof(CHoverAirMoveType ), "");
-	static_assert(sizeof(CGroundMoveType) >= sizeof(CStaticMoveType   ), "");
-	static_assert(sizeof(CGroundMoveType) >= sizeof(CScriptMoveType   ), "");
+	CompileSizeChecker<CGroundMoveType, CStrafeAirMoveType>::MustBeGreaterThan();
+	CompileSizeChecker<CGroundMoveType, CHoverAirMoveType>::MustBeGreaterThan();
+	CompileSizeChecker<CGroundMoveType, CStaticMoveType>::MustBeGreaterThan();
+	CompileSizeChecker<CGroundMoveType, CScriptMoveType>::MustBeGreaterThan();
 }
 
 AMoveType* MoveTypeFactory::GetMoveType(CUnit* unit, const UnitDef* ud) {
-	static_assert(sizeof(CGroundMoveType) <= sizeof(unit->amtMemBuffer), "");
-	static_assert(sizeof(CScriptMoveType) <= sizeof(unit->smtMemBuffer), "");
+	CompileSizeChecker<CGroundMoveType, size_t, sizeof(CGroundMoveType), CUnit::amtMemBufferSize>::MustBeLessThan();
+	CompileSizeChecker<CScriptMoveType, size_t, sizeof(CScriptMoveType), CUnit::smtMemBufferSize>::MustBeLessThan();
 
 	if (ud->IsGroundUnit()) {
 		// mobile ground-unit

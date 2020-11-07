@@ -1,5 +1,5 @@
 if    (MINGW OR APPLE OR MSVC)
-	find_package(SDL2 REQUIRED)
+	find_vcpkg(SDL2 SDL_LIBRARY_VCPKG)
 	include_directories(${SDL2_INCLUDE_DIR})
 else  (MINGW OR APPLE OR MSVC)
 	# Use a direct copy of the GL and SDL headers,
@@ -23,3 +23,5 @@ add_library(engineaGui STATIC
 		"${CMAKE_CURRENT_SOURCE_DIR}/VerticalLayout.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Window.cpp"
 	)
+
+find_libs_for_vcpkg(engineaGui)

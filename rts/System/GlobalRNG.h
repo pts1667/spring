@@ -98,7 +98,7 @@ private:
 template<typename RNG, bool synced> class CGlobalRNG {
 public:
 	typedef typename RNG::val_type rng_val_type;
-	typedef typename RNG::res_type rng_res_type;
+	typedef typename RNG::res_type result_type;
 
 	static_assert(std::numeric_limits<float>::digits == 24, "sign plus mantissa bits should be 24");
 
@@ -117,18 +117,18 @@ public:
 	rng_val_type GetGenState() const { return (gen.state()); }
 
 	// needed for std::{random_}shuffle
-	rng_res_type operator()(              ) { return (gen. next( )); }
-	rng_res_type operator()(rng_res_type N) { return (gen.bnext(N)); }
+	result_type operator()(              ) { return (gen. next( )); }
+	result_type operator()(result_type N) { return (gen.bnext(N)); }
 
-	static constexpr rng_res_type  min() { return RNG::min_res; }
-	static constexpr rng_res_type  max() { return RNG::max_res; }
-	static constexpr rng_res_type ndig() { return std::numeric_limits<float>::digits; }
+	static constexpr result_type  min() { return RNG::min_res; }
+	static constexpr result_type  max() { return RNG::max_res; }
+	static constexpr result_type ndig() { return std::numeric_limits<float>::digits; }
 
 	// [0, N)
-	rng_res_type NextInt(rng_res_type N = max()) { return ((*this)(N)); }
+	result_type NextInt(result_type N = max()) { return ((*this)(N)); }
 
 	float NextFloat() { return (NextFloat01(1 << ndig())); }
-	float NextFloat01(rng_res_type N) { return ((NextInt(N) * 1.0f) / N); } // [0,1) rounded to multiple of 1/N
+	float NextFloat01(result_type N) { return ((NextInt(N) * 1.0f) / N); } // [0,1) rounded to multiple of 1/N
 	float NextFloat24() { return (math::ldexp(NextInt(1 << ndig()), -ndig())); } // [0,1) rounded to multiple of 1/(2^#digits)
 
 	float3 NextVector2D() { return (NextVector(0.0f)); }

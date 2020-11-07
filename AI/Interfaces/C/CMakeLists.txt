@@ -50,7 +50,8 @@ macro    (configure_native_skirmish_ai mySourceDirRel_var additionalSources_var 
 		fix_lib_name(${myTarget})
 
 		add_dependencies(${myTarget} generateVersionFiles)
-		target_link_libraries(${myTarget} ${additionalLibraries})
+		find_libs_for_vcpkg(${myTarget})
+		target_link_libraries(${myTarget} PRIVATE ${additionalLibraries})
 		set_target_properties(${myTarget} PROPERTIES COMPILE_FLAGS "${additionalCompileFlags}")
 		set_target_properties(${myTarget} PROPERTIES OUTPUT_NAME   "SkirmishAI")
 

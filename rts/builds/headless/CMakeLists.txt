@@ -23,7 +23,11 @@ if    (MINGW OR APPLE OR MSVC)
 	# Cocoa requires the SDL libary, whenever the SDL headers are used,
 	# due to some #define magic, which is practically impossible to workaround.
 	find_package(OpenGL REQUIRED)
-	find_package(SDL2 REQUIRED)
+	find_vcpkg(SDL2 SDL_LIBRARY_VCPKG)
+	if (MSVC)
+		find_vcpkg(OpenAL OPENAL_LIBRARY_VCPKG) # sorry, needed for vcpkg
+	endif()
+
 	include_directories(${SDL2_INCLUDE_DIR})
 else  ()
 	# Use a direct copy of the GL and SDL headers,
@@ -49,7 +53,8 @@ include_directories(${ENGINE_SRC_ROOT_DIR}/lib/slimsig/include)
 
 ### Build the executable
 add_executable(engine-headless ${engineSources} ${ENGINE_ICON})
-target_link_libraries(engine-headless no-sound ${engineHeadlessLibraries} no-sound)
+find_libs_for_vcpkg(engine-headless)
+target_link_libraries(engine-headless PRIVATE no-sound ${engineHeadlessLibraries} no-sound)
 
 if    (MINGW)
 	# To enable console output/force a console window to open

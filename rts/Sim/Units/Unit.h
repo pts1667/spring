@@ -11,7 +11,6 @@
 #include "System/Matrix44f.h"
 #include "System/type2.h"
 
-
 class CPlayer;
 class CCommandAI;
 class CGroup;
@@ -26,26 +25,24 @@ struct UnitDef;
 struct UnitLoadParams;
 struct SLosInstance;
 
-
 // LOS state bits
-#define LOS_INLOS      (1 << 0)  // the unit is currently in the los of the allyteam
-#define LOS_INRADAR    (1 << 1)  // the unit is currently in radar from the allyteam
-#define LOS_PREVLOS    (1 << 2)  // the unit has previously been in los from the allyteam
-#define LOS_CONTRADAR  (1 << 3)  // the unit has continuously been in radar since it was last inlos by the allyteam
+#define LOS_INLOS (1 << 0)		 // the unit is currently in the los of the allyteam
+#define LOS_INRADAR (1 << 1)	 // the unit is currently in radar from the allyteam
+#define LOS_PREVLOS (1 << 2)	 // the unit has previously been in los from the allyteam
+#define LOS_CONTRADAR (1 << 3) // the unit has continuously been in radar since it was last inlos by the allyteam
 
 #define LOS_MASK_SHIFT 4
 
 // LOS mask bits  (masked bits are not automatically updated)
-#define LOS_INLOS_MASK     (LOS_INLOS << LOS_MASK_SHIFT)   // do not update LOS_INLOS
-#define LOS_INRADAR_MASK   (LOS_INRADAR << LOS_MASK_SHIFT)   // do not update LOS_INRADAR
-#define LOS_PREVLOS_MASK   (LOS_PREVLOS << LOS_MASK_SHIFT)  // do not update LOS_PREVLOS
-#define LOS_CONTRADAR_MASK (LOS_CONTRADAR << LOS_MASK_SHIFT)  // do not update LOS_CONTRADAR
+#define LOS_INLOS_MASK (LOS_INLOS << LOS_MASK_SHIFT)				 // do not update LOS_INLOS
+#define LOS_INRADAR_MASK (LOS_INRADAR << LOS_MASK_SHIFT)		 // do not update LOS_INRADAR
+#define LOS_PREVLOS_MASK (LOS_PREVLOS << LOS_MASK_SHIFT)		 // do not update LOS_PREVLOS
+#define LOS_CONTRADAR_MASK (LOS_CONTRADAR << LOS_MASK_SHIFT) // do not update LOS_CONTRADAR
 
 #define LOS_ALL_BITS \
-	(LOS_INLOS      | LOS_INRADAR      | LOS_PREVLOS      | LOS_CONTRADAR)
+	(LOS_INLOS | LOS_INRADAR | LOS_PREVLOS | LOS_CONTRADAR)
 #define LOS_ALL_MASK_BITS \
 	(LOS_INLOS_MASK | LOS_INRADAR_MASK | LOS_PREVLOS_MASK | LOS_CONTRADAR_MASK)
-
 
 class CUnit : public CSolidObject
 {
@@ -60,35 +57,35 @@ public:
 	void SanityCheck() const;
 	void PreUpdate() { preFramePos = pos; }
 
-	virtual void PreInit(const UnitLoadParams& params);
-	virtual void PostInit(const CUnit* builder);
+	virtual void PreInit(const UnitLoadParams &params);
+	virtual void PostInit(const CUnit *builder);
 
 	virtual void Update();
 	virtual void SlowUpdate();
 
-	const SolidObjectDef* GetDef() const override { return ((const SolidObjectDef*) unitDef); }
+	const SolidObjectDef *GetDef() const override { return ((const SolidObjectDef *)unitDef); }
 
-	virtual void DoDamage(const DamageArray& damages, const float3& impulse, CUnit* attacker, int weaponDefID, int projectileID) override;
+	virtual void DoDamage(const DamageArray &damages, const float3 &impulse, CUnit *attacker, int weaponDefID, int projectileID) override;
 	virtual void DoWaterDamage();
 	virtual void FinishedBuilding(bool postInit);
 
-	void ApplyDamage(CUnit* attacker, const DamageArray& damages, float& baseDamage, float& experienceMod);
-	void ApplyImpulse(const float3& impulse) override;
+	void ApplyDamage(CUnit *attacker, const DamageArray &damages, float &baseDamage, float &experienceMod);
+	void ApplyImpulse(const float3 &impulse) override;
 
-	bool AttackUnit(CUnit* unit, bool isUserTarget, bool wantManualFire, bool fpsMode = false);
-	bool AttackGround(const float3& pos, bool isUserTarget, bool wantManualFire, bool fpsMode = false);
+	bool AttackUnit(CUnit *unit, bool isUserTarget, bool wantManualFire, bool fpsMode = false);
+	bool AttackGround(const float3 &pos, bool isUserTarget, bool wantManualFire, bool fpsMode = false);
 	void DropCurrentAttackTarget();
 
 	int GetBlockingMapID() const override { return id; }
 
 	void ChangeLos(int losRad, int airRad);
 	// negative amount=reclaim, return= true -> build power was successfully applied
-	bool AddBuildPower(CUnit* builder, float amount) override;
+	bool AddBuildPower(CUnit *builder, float amount) override;
 
 	void Activate();
 	void Deactivate();
 
-	void ForcedMove(const float3& newPos) override;
+	void ForcedMove(const float3 &newPos) override;
 
 	void DeleteScript();
 	void EnableScriptMoveType();
@@ -96,9 +93,9 @@ public:
 
 	CMatrix44f GetTransformMatrix(bool synced = false, bool fullread = false) const final override;
 
-	void DependentDied(CObject* o) override;
+	void DependentDied(CObject *o) override;
 
-	bool AllowedReclaim(CUnit* builder) const;
+	bool AllowedReclaim(CUnit *builder) const;
 
 	void SetMetalStorage(float newStorage);
 	void SetEnergyStorage(float newStorage);
@@ -109,18 +106,18 @@ public:
 	void AddEnergy(float energy, bool useIncomeMultiplier = true);
 	bool AddHarvestedMetal(float metal);
 
-	void SetStorage(const SResourcePack& newstorage);
-	bool HaveResources(const SResourcePack& res) const;
-	bool UseResources(const SResourcePack& res);
-	void AddResources(const SResourcePack& res, bool useIncomeMultiplier = true);
-	bool IssueResourceOrder(SResourceOrder* order);
+	void SetStorage(const SResourcePack &newstorage);
+	bool HaveResources(const SResourcePack &res) const;
+	bool UseResources(const SResourcePack &res);
+	void AddResources(const SResourcePack &res, bool useIncomeMultiplier = true);
+	bool IssueResourceOrder(SResourceOrder *order);
 
 	// push the new wind to the script
 	void UpdateWind(float x, float z, float strength);
 
 	void UpdateTransportees();
-	void ReleaseTransportees(CUnit* attacker, bool selfDestruct, bool reclaimed);
-	void TransporteeKilled(const CObject* o);
+	void ReleaseTransportees(CUnit *attacker, bool selfDestruct, bool reclaimed);
+	void TransporteeKilled(const CObject *o);
 
 	void AddExperience(float exp);
 
@@ -133,10 +130,10 @@ public:
 	void UpdatePhysicalState(float eps) override;
 
 	float3 GetErrorVector(int allyteam) const;
-	float3 GetErrorPos(int allyteam, bool aiming = false) const { return (aiming? aimPos: midPos) + GetErrorVector(allyteam); }
+	float3 GetErrorPos(int allyteam, bool aiming = false) const { return (aiming ? aimPos : midPos) + GetErrorVector(allyteam); }
 	float3 GetObjDrawErrorPos(int allyteam) const { return (GetObjDrawMidPos() + GetErrorVector(allyteam)); }
 
-	float3 GetLuaErrorVector(int allyteam, bool fullRead) const { return (fullRead? ZeroVector: GetErrorVector(allyteam)); }
+	float3 GetLuaErrorVector(int allyteam, bool fullRead) const { return (fullRead ? ZeroVector : GetErrorVector(allyteam)); }
 	float3 GetLuaErrorPos(int allyteam, bool fullRead) const { return (midPos + GetLuaErrorVector(allyteam, fullRead)); }
 
 	float3 GetDrawDeltaPos(float dt) const { return ((pos - preFramePos) * dt); }
@@ -154,18 +151,21 @@ public:
 	bool IsIdle() const;
 
 	bool HaveTarget() const { return (curTarget.type != Target_None); }
-	bool CanUpdateWeapons() const {
+	bool CanUpdateWeapons() const
+	{
 		return (forceUseWeapons || (allowUseWeapons && !onTempHoldFire && !isDead && !beingBuilt && !IsStunned()));
 	}
 
 	void SetNeutral(bool b);
 	void SetStunned(bool stun);
 
-	bool GetPosErrorBit(int at) const {
+	bool GetPosErrorBit(int at) const
+	{
 		return (posErrorMask[at / 32] & (1 << (at % 32)));
 	}
-	void SetPosErrorBit(int at, int bit) {
-		posErrorMask[at / 32] |=  ((1 << (at % 32)) * (bit == 1));
+	void SetPosErrorBit(int at, int bit)
+	{
+		posErrorMask[at / 32] |= ((1 << (at % 32)) * (bit == 1));
 		posErrorMask[at / 32] &= ~((1 << (at % 32)) * (bit == 0));
 	}
 
@@ -182,10 +182,11 @@ public:
 	void SlowUpdateCloak(bool stunCheck);
 
 	bool ScriptCloak();
-	bool ScriptDecloak(const CSolidObject* object, const CWeapon* weapon);
+	bool ScriptDecloak(const CSolidObject *object, const CWeapon *weapon);
 	bool GetNewCloakState(bool checkStun);
 
-	enum ChangeType {
+	enum ChangeType
+	{
 		ChangeGiven,
 		ChangeCaptured
 	};
@@ -195,60 +196,65 @@ public:
 	//Transporter stuff
 	CR_DECLARE_SUB(TransportedUnit)
 
-	struct TransportedUnit {
+	struct TransportedUnit
+	{
 		CR_DECLARE_STRUCT(TransportedUnit)
-		CUnit* unit;
+		CUnit *unit;
 		int piece;
 	};
 
-	bool SetSoloBuilder(CUnit* builder, const UnitDef* buildeeDef);
-	void SetLastAttacker(CUnit* attacker);
+	bool SetSoloBuilder(CUnit *builder, const UnitDef *buildeeDef);
+	void SetLastAttacker(CUnit *attacker);
 
-	void SetTransporter(CUnit* trans) { transporter = trans; }
-	CUnit* GetTransporter() const { return transporter; }
+	void SetTransporter(CUnit *trans) { transporter = trans; }
+	CUnit *GetTransporter() const { return transporter; }
 
-	bool AttachUnit(CUnit* unit, int piece, bool force = false);
-	bool CanTransport(const CUnit* unit) const;
+	bool AttachUnit(CUnit *unit, int piece, bool force = false);
+	bool CanTransport(const CUnit *unit) const;
 
-	bool DetachUnit(CUnit* unit);
-	bool DetachUnitCore(CUnit* unit);
-	bool DetachUnitFromAir(CUnit* unit, const float3& pos); // orders <unit> to move to <pos> after detach
+	bool DetachUnit(CUnit *unit);
+	bool DetachUnitCore(CUnit *unit);
+	bool DetachUnitFromAir(CUnit *unit, const float3 &pos); // orders <unit> to move to <pos> after detach
 
-	bool CanLoadUnloadAtPos(const float3& wantedPos, const CUnit* unit, float* wantedHeightPtr = nullptr) const;
-	float GetTransporteeWantedHeight(const float3& wantedPos, const CUnit* unit, bool* ok = nullptr) const;
-	short GetTransporteeWantedHeading(const CUnit* unit) const;
+	bool CanLoadUnloadAtPos(const float3 &wantedPos, const CUnit *unit, float *wantedHeightPtr = nullptr) const;
+	float GetTransporteeWantedHeight(const float3 &wantedPos, const CUnit *unit, bool *ok = nullptr) const;
+	short GetTransporteeWantedHeading(const CUnit *unit) const;
 
 public:
-	void KilledScriptFinished(int wreckLevel) { deathScriptFinished = true; delayedWreckLevel = wreckLevel; }
-	void ForcedKillUnit(CUnit* attacker, bool selfDestruct, bool reclaimed, bool showDeathSequence = true);
-	virtual void KillUnit(CUnit* attacker, bool selfDestruct, bool reclaimed, bool showDeathSequence = true);
-	virtual void IncomingMissile(CMissileProjectile* missile);
+	void KilledScriptFinished(int wreckLevel)
+	{
+		deathScriptFinished = true;
+		delayedWreckLevel = wreckLevel;
+	}
+	void ForcedKillUnit(CUnit *attacker, bool selfDestruct, bool reclaimed, bool showDeathSequence = true);
+	virtual void KillUnit(CUnit *attacker, bool selfDestruct, bool reclaimed, bool showDeathSequence = true);
+	virtual void IncomingMissile(CMissileProjectile *missile);
 
 	void TempHoldFire(int cmdID);
 	void SetHoldFire(bool b) { onTempHoldFire = b; }
 
 	// start this unit in free fall from parent unit
-	void Drop(const float3& parentPos, const float3& parentDir, CUnit* parent);
+	void Drop(const float3 &parentPos, const float3 &parentDir, CUnit *parent);
 	void PostLoad();
 
 protected:
 	void ChangeTeamReset();
 	void UpdateResources();
-	float GetFlankingDamageBonus(const float3& attackDir);
+	float GetFlankingDamageBonus(const float3 &attackDir);
 
 public: // unsynced methods
-	bool SetGroup(CGroup* newGroup, bool fromFactory = false, bool autoSelect = true);
+	bool SetGroup(CGroup *newGroup, bool fromFactory = false, bool autoSelect = true);
 
-	const CGroup* GetGroup() const;
-	      CGroup* GetGroup();
+	const CGroup *GetGroup() const;
+	CGroup *GetGroup();
 
 public:
-	static void  SetEmpDeclineRate(float value) { empDeclineRate = value; }
-	static void  SetExpMultiplier(float value) { expMultiplier = value; }
-	static void  SetExpPowerScale(float value) { expPowerScale = value; }
-	static void  SetExpHealthScale(float value) { expHealthScale = value; }
-	static void  SetExpReloadScale(float value) { expReloadScale = value; }
-	static void  SetExpGrade(float value) { expGrade = value; }
+	static void SetEmpDeclineRate(float value) { empDeclineRate = value; }
+	static void SetExpMultiplier(float value) { expMultiplier = value; }
+	static void SetExpPowerScale(float value) { expPowerScale = value; }
+	static void SetExpHealthScale(float value) { expHealthScale = value; }
+	static void SetExpReloadScale(float value) { expReloadScale = value; }
+	static void SetExpGrade(float value) { expGrade = value; }
 
 	static float GetExpMultiplier() { return expMultiplier; }
 	static float GetExpPowerScale() { return expPowerScale; }
@@ -256,71 +262,74 @@ public:
 	static float GetExpReloadScale() { return expReloadScale; }
 	static float GetExpGrade() { return expGrade; }
 
-	static float ExperienceScale(const float limExperience, const float experienceWeight) {
+	static float ExperienceScale(const float limExperience, const float experienceWeight)
+	{
 		// limExperience ranges from 0.0 to 0.9999..., experienceWeight
 		// should be in [0, 1] and have no effect on accuracy when zero
 		return (1.0f - (limExperience * experienceWeight));
 	}
 
 public:
-	const UnitDef* unitDef = nullptr;
+	const UnitDef *unitDef = nullptr;
 
 	// Our shield weapon, NULL if we have none
-	CWeapon* shieldWeapon = nullptr;
+	CWeapon *shieldWeapon = nullptr;
 	// Our weapon with stockpiled ammo, NULL if we have none
-	CWeapon* stockpileWeapon = nullptr;
+	CWeapon *stockpileWeapon = nullptr;
 
-	const DynDamageArray* selfdExpDamages = nullptr;
-	const DynDamageArray* deathExpDamages = nullptr;
+	const DynDamageArray *selfdExpDamages = nullptr;
+	const DynDamageArray *deathExpDamages = nullptr;
 
-	CUnit* soloBuilder = nullptr;
-	CUnit* lastAttacker = nullptr;
+	CUnit *soloBuilder = nullptr;
+	CUnit *lastAttacker = nullptr;
 	// transport that the unit is currently in
-	CUnit* transporter = nullptr;
+	CUnit *transporter = nullptr;
 
 	// player who is currently FPS'ing this unit
-	CPlayer* fpsControlPlayer = nullptr;
+	CPlayer *fpsControlPlayer = nullptr;
 
-	AMoveType* moveType = nullptr;
-	AMoveType* prevMoveType = nullptr;
+	AMoveType *moveType = nullptr;
+	AMoveType *prevMoveType = nullptr;
 
-	CCommandAI* commandAI = nullptr;
-	CUnitScript* script = nullptr;
+	CCommandAI *commandAI = nullptr;
+	CUnitScript *script = nullptr;
 
 	// current attackee
 	SWeaponTarget curTarget;
 
+	static constexpr size_t usMemBufferSize = 512;
+	static constexpr size_t amtMemBufferSize = 512;
+	static constexpr size_t smtMemBufferSize = 512;
+	static constexpr size_t caiMemBufferSize = 700;
 
 	// sufficient for the largest UnitScript (CLuaUnitScript)
-	uint8_t usMemBuffer[368];
+	uint8_t usMemBuffer[usMemBufferSize];
 	// sufficient for the largest AMoveType (CGroundMoveType)
 	// need two buffers since ScriptMoveType might be enabled
-	uint8_t amtMemBuffer[498];
-	uint8_t smtMemBuffer[370];
+	uint8_t amtMemBuffer[amtMemBufferSize];
+	uint8_t smtMemBuffer[smtMemBufferSize];
 	// sufficient for the largest CommandAI type (CBuilderCAI)
 	// knowing the exact CAI object size here is not required;
 	// static asserts will catch any overflow
-	uint8_t caiMemBuffer[700];
+	uint8_t caiMemBuffer[caiMemBufferSize];
 
-
-	std::vector<CWeapon*> weapons;
+	std::vector<CWeapon *> weapons;
 
 	// which squares the unit can currently observe, per los-type
-	std::array<SLosInstance*, /*ILosType::LOS_TYPE_COUNT*/ 7> los{{nullptr}};
+	std::array<SLosInstance *, /*ILosType::LOS_TYPE_COUNT*/ 7> los{{nullptr}};
 
 	// indicates the los/radar status each allyteam has on this unit
 	// should technically be MAX_ALLYTEAMS, but #allyteams <= #teams
 	std::array<unsigned char, /*MAX_TEAMS*/ 255> losStatus{{0}};
 	// bit-mask indicating which allyteams see this unit with positional error
-	std::array<unsigned  int, /*MAX_TEAMS/32*/ 8> posErrorMask{{1}};
+	std::array<unsigned int, /*MAX_TEAMS/32*/ 8> posErrorMask{{1}};
 
 	// quads the unit is part of
 	std::vector<int> quads;
 
 	std::vector<TransportedUnit> transportedUnits;
 	// incoming projectiles for which flares can cause retargeting
-	std::array<CMissileProjectile*, /*MAX_INCOMING_MISSILES*/ 8> incomingMissiles{{nullptr}};
-
+	std::array<CMissileProjectile *, /*MAX_INCOMING_MISSILES*/ 8> incomingMissiles{{nullptr}};
 
 	// position at start of current simframe; updated by ForcedMove
 	// used as interpolation reference for drawpos since a unit can
@@ -334,7 +343,6 @@ public:
 	// used for radar inaccuracy etc
 	float3 posErrorVector;
 	float3 posErrorDelta;
-
 
 	int featureDefID = -1; // FeatureDef id of the wreck we spawn on death
 
@@ -350,7 +358,6 @@ public:
 	float experience = 0.0f;
 	// approaches 1 as experience approaches infinity
 	float limExperience = 0.0f;
-
 
 	// how much terraforming is left to do
 	float terraformLeft = 0.0f;
@@ -372,7 +379,6 @@ public:
 
 	int transportCapacityUsed = 0;
 	float transportMassUsed = 0.0f;
-
 
 	// the wreck level the unit will eventually create when it has died
 	int delayedWreckLevel = -1;
@@ -408,7 +414,6 @@ public:
 
 	float seismicSignature = 0.0f;
 	float decloakDistance = 0.0f;
-
 
 	// only when the unit is active
 	SResourcePack resourcesCondUse;
@@ -462,13 +467,13 @@ public:
 	int flankingBonusMode = 0;
 
 	// how much the lowest damage direction of the flanking bonus can turn upon an attack (zeroed when attacked, slowly increases)
-	float  flankingBonusMobility = 10.0f;
+	float flankingBonusMobility = 10.0f;
 	// how much ability of the flanking bonus direction to move builds up each frame
-	float  flankingBonusMobilityAdd = 0.01f;
+	float flankingBonusMobilityAdd = 0.01f;
 	// average factor to multiply damage by
-	float  flankingBonusAvgDamage = 1.4f;
+	float flankingBonusAvgDamage = 1.4f;
 	// (max damage - min damage) / 2
-	float  flankingBonusDifDamage = 0.5f;
+	float flankingBonusDifDamage = 0.5f;
 
 	float armoredMultiple = 1.0f;
 	// multiply all damage the unit take with this
@@ -484,7 +489,6 @@ public:
 
 	// the damage value passed to CEGs spawned by this unit's script
 	int cegDamage = 0;
-
 
 	// if the unit is in it's 'on'-state
 	bool activated = false;
@@ -507,7 +511,7 @@ public:
 
 	// Lua overrides for CanUpdateWeapons
 	bool forceUseWeapons = false;
-	bool allowUseWeapons =  true;
+	bool allowUseWeapons = true;
 
 	// signals if script has finished executing Killed and the unit can be deleted
 	bool deathScriptFinished = false;
@@ -525,7 +529,6 @@ public:
 	bool isCloaked = false;
 	// true if the unit currently wants to be cloaked
 	bool wantCloak = false;
-
 
 	// unsynced vars
 	bool noMinimap = false;

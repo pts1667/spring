@@ -35,14 +35,15 @@ if(DEBUG_GLSTATE)
 endif()
 
 ### give error when not found
-find_package_static(DevIL REQUIRED)
+find_vcpkg_static(DevIL IL_LIBRARY_VCPKG)
+include_directories(${IL_INCLUDE_DIR})
 
 ### Assemble common incude dirs
 include_directories(BEFORE lib/lua/include)
-include_directories(${CMAKE_SOURCE_DIR}/include/AL)
+include_directories(BEFORE ${CMAKE_SOURCE_DIR}/include)
+include_directories(BEFORE ${CMAKE_SOURCE_DIR}/include/AL)
 include_directories(${SPRING_MINIZIP_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${IL_INCLUDE_DIR})
 
 ### Assemble common libraries
 add_subdirectory(System/Sound)
@@ -73,7 +74,9 @@ if    (UNIX AND NOT MINGW)
 	endif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 endif (UNIX AND NOT MINGW)
 
-find_package_static(ZLIB REQUIRED)
+find_vcpkg_static(ZLIB ZLIB_LIBRARY_VCPKG)
+include_directories(${ZLIB_INCLUDE_DIR})
+
 list(APPEND engineCommonLibraries ${IL_LIBRARIES} ${JPEG_LIBRARY} ${PNG_LIBRARY} ${TIFF_LIBRARY} ${GIF_LIBRARY})
 list(APPEND engineCommonLibraries 7zip ${SPRING_MINIZIP_LIBRARY} ${ZLIB_LIBRARY})
 list(APPEND engineCommonLibraries lua luasocket archives assimp gflags)
@@ -81,7 +84,6 @@ if (ENABLE_STREFLOP)
 	list(APPEND engineCommonLibraries streflop)
 endif ()
 
-include_directories(${ZLIB_INCLUDE_DIR})
 
 if (WIN32)
 	list(APPEND engineCommonLibraries ${WIN32_LIBRARIES})

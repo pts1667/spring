@@ -2,6 +2,8 @@
 
 /* generic backtrace() implementation shamelessly ripped from GNU libc 6 */
 
+#include <stddef.h>
+
 #ifdef __MINGW32__
 
 /* Assume we're being compiled without -fbounding-pointers. */
@@ -117,11 +119,14 @@ int backtrace (void **array, int size)
 // This part is for MSVC and is (obviously) not from GNU libc
 // Might actually work on mingw as well, feel free to test and replace.
 #if defined _MSC_VER
+#include <windows.h>
+
 int backtrace(void **array, int framesToCapture)
 {
 	int frames = 0;
 #ifdef _M_X64
-	frames = CaptureStackBackTrace(framesToSkip, framesToCapture, backTrace, nullptr);
+	void* backTraceData = NULL;
+	frames = CaptureStackBackTrace(0, framesToCapture, backTraceData, NULL);
 #else
 	__try {
 		void **frame = 0;

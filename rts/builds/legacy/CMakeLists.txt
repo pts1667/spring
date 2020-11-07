@@ -7,23 +7,28 @@
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 
-
 ### Assemble libraries
-find_package(SDL2 REQUIRED)
+find_vcpkg(SDL2)
 set(engineIncludes ${SDL2_INCLUDE_DIR})
 set(engineLibraries ${SDL2_LIBRARY})
-if("${SDL2_VERSION_STRING}" VERSION_LESS "2")
+if(NOT VCPKG_TOOLCHAIN AND "${SDL2_VERSION_STRING}" VERSION_LESS "2")
 	message(FATAL_ERROR "Found SDL v${SDL2_VERSION_STRING} while 2 is required!")
 endif()
 
 
 set(OpenGL_GL_PREFERENCE LEGACY)
 find_package_static(OpenGL REQUIRED)
-find_package_static(GLEW 1.5.1 REQUIRED)
+find_vcpkg_static_ver(GLEW 1.5.1 GLEW_LIBRARY_VCPKG)
+if (NOT GLEW_FOUND)
+	find_vcpkg_static(GLEW GLEW_LIBRARY_VCPKG)
+endif()
 list(APPEND engineLibraries ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${GLEW_LIBRARIES})
 list(APPEND engineIncludes ${GLEW_INCLUDE_DIR})
 
-find_package_static(FontConfig)
+find_vcpkg_static(FontConfig FONTCONFIG_LIBRARY_VCPKG)
+if ((NOT VCPKG_TOOLCHAIN) AND (NOT FONTCONFIG_FOUND))
+	find_package_static(unofficial-fontconfig)
+endif()
 if    (FONTCONFIG_FOUND)
 	list(APPEND engineIncludes ${FONTCONFIG_INCLUDE_DIR})
 	list(APPEND engineLibraries ${FONTCONFIG_LIBRARIES})
@@ -36,8 +41,11 @@ if    (FONTCONFIG_FOUND)
 	endif (PREFER_STATIC_LIBS)
 endif (FONTCONFIG_FOUND)
 
-find_freetype_hack() # hack to find different named freetype.dll
-find_package_static(Freetype REQUIRED)
+#find_freetype_hack() # hack to find different named freetype.dll
+find_vcpkg_static(Freetype FREETYPE_LIBRARY_VCPKG)
+if ((NOT VCPKG_TOOLCHAIN) AND (NOT FREETYPE_FOUND))
+	find_package_static(freetype CONFIG REQUIRED)
+endif()
 foreach(f ${FREETYPE_INCLUDE_DIRS})
 	list(APPEND engineIncludes ${f})
 endforeach(f)
@@ -76,7 +84,8 @@ include_directories(${engineIncludes})
 
 ### Build the executable
 add_executable(engine-legacy ${EXE_FLAGS} ${engineSources} ${ENGINE_ICON} ${engineHeaders})
-target_link_libraries(engine-legacy ${engineLibraries})
+find_libs_for_vcpkg(engine-legacy)
+target_link_libraries(engine-legacy PUBLIC ${engineLibraries})
 
 
 ### Install the executable

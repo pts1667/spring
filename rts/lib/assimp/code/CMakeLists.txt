@@ -43,7 +43,7 @@
 # 3) Add libassimp using the file lists (eliminates duplication of file names between
 #    source groups and library command)
 #
-cmake_minimum_required( VERSION 2.6 )
+cmake_minimum_required( VERSION 3.0 )
 SET( HEADER_PATH ../include/assimp )
 
 SET( COMPILER_HEADERS
@@ -871,18 +871,19 @@ ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
 ADD_LIBRARY( assimp ${assimp_src} )
 
-TARGET_LINK_LIBRARIES(assimp ${ZLIB_LIBRARIES} ${OPENDDL_PARSER_LIBRARIES} ${IRRXML_LIBRARY} )
+TARGET_LINK_LIBRARIES(assimp PRIVATE ${ZLIB_LIBRARIES} ${OPENDDL_PARSER_LIBRARIES} ${IRRXML_LIBRARY})
+find_libs_for_vcpkg(assimp)
 
 if(ANDROID AND ASSIMP_ANDROID_JNIIOSYSTEM)
   set(ASSIMP_ANDROID_JNIIOSYSTEM_PATH port/AndroidJNI)
   add_subdirectory(../${ASSIMP_ANDROID_JNIIOSYSTEM_PATH}/ ../${ASSIMP_ANDROID_JNIIOSYSTEM_PATH}/)
-  target_link_libraries(assimp android_jniiosystem)
+  target_link_libraries(assimp PRIVATE android_jniiosystem)
 endif(ANDROID AND ASSIMP_ANDROID_JNIIOSYSTEM)
 
 IF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
-  TARGET_LINK_LIBRARIES(assimp optimized ${C4D_RELEASE_LIBRARIES})
-  TARGET_LINK_LIBRARIES(assimp debug ${C4D_DEBUG_LIBRARIES})
-  TARGET_LINK_LIBRARIES(assimp ${C4D_EXTRA_LIBRARIES})
+  TARGET_LINK_LIBRARIES(assimp PRIVATE optimized ${C4D_RELEASE_LIBRARIES})
+  TARGET_LINK_LIBRARIES(assimp PRIVATE debug ${C4D_DEBUG_LIBRARIES})
+  TARGET_LINK_LIBRARIES(assimp PRIVATE ${C4D_EXTRA_LIBRARIES})
 ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
 if( MSVC )
