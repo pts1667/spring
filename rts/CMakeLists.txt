@@ -40,10 +40,6 @@ include_directories(${IL_INCLUDE_DIR})
 
 ### Assemble common incude dirs
 include_directories(BEFORE lib/lua/include)
-<<<<<<< HEAD
-=======
-include_directories(BEFORE lib/daScript/include)
->>>>>>> 6e134e9c45d8e84dd5d870a6e0c2a2c73c64e84d
 include_directories(BEFORE ${CMAKE_SOURCE_DIR}/include)
 include_directories(BEFORE ${CMAKE_SOURCE_DIR}/include/AL)
 include_directories(${SPRING_MINIZIP_INCLUDE_DIR})
