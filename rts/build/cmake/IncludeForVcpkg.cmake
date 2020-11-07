@@ -11,7 +11,7 @@ macro(FIND_VCPKG_STATIC)
 		find_package_static(${ARGV0} REQUIRED)
 	else()
 		set(${ARGV1} ON)
-		if(${ARGV0} MATCHES DevIL) # just in case
+		if(${ARGV0} MATCHES DevIL AND CMAKE_BUILD_TYPE MATCHES RELEASE) # just in case
 			set(IL_LIBRARIES ${VCPKG_ROOT}/installed/x64-windows-static/lib/DevIL.lib)
 		endif()
 	endif()

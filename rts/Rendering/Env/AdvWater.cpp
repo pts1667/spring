@@ -16,7 +16,8 @@
 
 CAdvWater::CAdvWater(bool refractive)
 {
-	uint8_t scrap[512 * 512 * 4];
+	std::vector<uint8_t> scrapData(512 * 512 * 4, 0);
+	auto scrap = scrapData.data();
 
 	glGenTextures(1, &reflectTexture);
 	glBindTexture(GL_TEXTURE_2D, reflectTexture);

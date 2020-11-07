@@ -76,6 +76,7 @@ list(APPEND engineLibraries engineSim)
 list(APPEND engineLibraries pr-downloader_static)
 
 ### Assemble external incude dirs
+find_vcpkg_static(OpenAL OPENAL_LIBRARY_VCPKG)
 list(APPEND engineIncludes ${OPENAL_INCLUDE_DIR})
 list(APPEND engineIncludes ${ENGINE_SRC_ROOT_DIR}/lib/asio/include)
 list(APPEND engineIncludes ${ENGINE_SRC_ROOT_DIR}/lib/slimsig/include)
