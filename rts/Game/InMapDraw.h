@@ -31,17 +31,17 @@ public:
 	void MouseRelease(int x, int y, int button);
 	void MouseMove(int x, int y, int dx, int dy, int button);
 	/** @return playerId */
-	int GotNetMsg(std::shared_ptr<const netcode::RawPacket>& packet);
+	int GotNetMsg(std::shared_ptr<const netcode::RawPacket> &packet);
 
-	void SendPoint(const float3& pos, const std::string& label, bool fromLua);
-	void SendLine(const float3& pos1, const float3& pos2, bool fromLua);
-	void SendErase(const float3& pos);
-	void SendWaitingInput(const std::string& label);
+	void SendPoint(const float3 &pos, const std::string &label, bool fromLua);
+	void SendLine(const float3 &pos1, const float3 &pos2, bool fromLua);
+	void SendErase(const float3 &pos);
+	void SendWaitingInput(const std::string &label);
 
-	void PromptLabel(const float3& pos);
+	void PromptLabel(const float3 &pos);
 
-	void GetPoints(std::vector<PointMarker>& points, size_t maxPoints, const std::array<int, MAX_TEAMS>& teamIDs);
-	void GetLines(std::vector<LineMarker>& lines, size_t maxLines, const std::array<int, MAX_TEAMS>& teamIDs);
+	void GetPoints(std::vector<PointMarker> &points, size_t maxPoints, const std::array<int, MAX_TEAMS> &teamIDs);
+	void GetLines(std::vector<LineMarker> &lines, size_t maxLines, const std::array<int, MAX_TEAMS> &teamIDs);
 
 	void SetDrawMode(bool drawMode) { this->drawMode = drawMode; }
 	bool IsDrawMode() const { return drawMode; }
@@ -78,9 +78,10 @@ private:
 	/// whether client ignores incoming Lua MAPDRAW net-messages (unsynced)
 	bool allowLuaMapDrawing = true;
 
-	uint8_t notificationPeeperMem[96];
+	static constexpr size_t notificationPeeperMemSize = 112;
+	uint8_t notificationPeeperMem[notificationPeeperMemSize];
 };
 
-extern CInMapDraw* inMapDrawer;
+extern CInMapDraw *inMapDrawer;
 
 #endif /* IN_MAP_DRAW_H */

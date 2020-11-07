@@ -44,8 +44,11 @@ GLAPI void APIENTRY glGenBuffersARB(GLsizei n, GLuint *buffers) {}
 GLAPI void APIENTRY glBindBufferARB(GLenum target, GLuint buffer) {}
 GLAPI void APIENTRY glBufferDataARB(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage) {}
 GLAPI void APIENTRY glCopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size) {}
+#ifdef __MINGW32__
+GLAPI void APIENTRY glCopyNamedBufferSubData(GLuint readBuffer, GLuint writeBuffer, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size) {}
+#else
 GLAPI void APIENTRY glCopyNamedBufferSubData(GLuint readBuffer, GLuint writeBuffer, GLintptr readOffset, GLintptr writeOffset, GLsizei size) {}
-
+#endif
 GLAPI void APIENTRY glGenVertexArrays(GLsizei n, GLuint* arrays) {}
 GLAPI void APIENTRY glDeleteVertexArrays(GLsizei n, const GLuint* arrays) {}
 GLAPI void APIENTRY glBindVertexArray(GLuint id) {}
@@ -168,7 +171,7 @@ GLAPI void APIENTRY glGetShaderSource(GLuint shader, GLsizei bufSize, GLsizei *l
 GLAPI void APIENTRY glCompileShader(GLuint shader) {}
 GLAPI void APIENTRY glGetShaderiv(GLuint shader, GLenum pname, GLint *params) {}
 GLAPI void APIENTRY glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {}
-#ifdef __APPLE__
+#if defined __APPLE__ || defined __MINGW32__
 // MacOS buildbot GL headers are ancient, need the extra const
 GLAPI void APIENTRY glShaderSource(GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length) {}
 #else

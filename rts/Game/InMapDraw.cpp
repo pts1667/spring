@@ -22,6 +22,7 @@
 #include "System/Log/ILog.h"
 #include "System/Sound/ISound.h"
 #include "System/Sound/ISoundChannels.h"
+#include "System/CompileSizeChecker.h"
 
 
 CInMapDraw* inMapDrawer = nullptr;
@@ -65,7 +66,7 @@ private:
 
 CInMapDraw::CInMapDraw()
 {
-	static_assert(sizeof(CNotificationPeeper) < sizeof(notificationPeeperMem), "");
+	CompileSizeChecker<CNotificationPeeper, size_t, sizeof(CNotificationPeeper), notificationPeeperMemSize>::MustBeStrictlyLessThan();
 	eventHandler.AddClient(new (notificationPeeperMem) CNotificationPeeper());
 }
 

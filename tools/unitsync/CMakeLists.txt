@@ -7,7 +7,7 @@
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "../..")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 
-find_package_static(ZLIB REQUIRED)
+find_vcpkg_static(ZLIB ZLIB_LIBRARY_VCPKG)
 
 list(APPEND unitsync_libs ${CMAKE_DL_LIBS})
 list(APPEND unitsync_libs 7zip lua headlessStubs archives)
@@ -23,7 +23,8 @@ if    (MINGW OR MSVC)
 	# We still need these header files,
 	# even if we are not going to link with SDL.
 	# We have them available anyway (mingwlibs).
-	find_package(SDL2 REQUIRED)
+	find_vcpkg(SDL2 REQUIRED)
+	include_directories(BEFORE ${CMAKE_SOURCE_DIR}/include)
 	include_directories(${SDL2_INCLUDE_DIR})
 else  (MINGW OR MSVC)
 	# Use a direct copy of the GL and SDL headers,
@@ -117,7 +118,8 @@ endif ()
 #   to be able to link to it
 add_library(unitsync SHARED ${unitsync_files})
 add_dependencies(unitsync generateVersionFiles)
-target_link_libraries(unitsync ${unitsync_libs})
+find_libs_for_vcpkg(unitsync)
+target_link_libraries(unitsync PRIVATE ${unitsync_libs})
 if (MINGW)
 	set_target_properties(unitsync PROPERTIES LINK_FLAGS -Wl,--add-stdcall-alias)
 endif (MINGW)

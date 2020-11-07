@@ -4,7 +4,10 @@
 #include <utility>
 #include <cstring>
 
-#include <IL/il.h>
+#ifdef _WIN32
+#define IL_STATIC_LIB
+#endif
+#include "IL/il.h"
 #include <SDL_video.h>
 
 #ifndef BITMAP_NO_OPENGL

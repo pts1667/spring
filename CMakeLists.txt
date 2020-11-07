@@ -9,6 +9,11 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_MODULES_SPRING}/OverrideFlags.cmake"
 
 project(Spring)
 
+# MSVC doesn't allow inline asm for x64 targets
+if (MSVC)
+	enable_language(ASM_MASM)
+endif()
+
 # dummy so that qtcreator shows all files (even those of windows)
 if(CMAKE_VERSION VERSION_GREATER 3.1.2)
 	add_library(platform_sources EXCLUDE_FROM_ALL "")
@@ -17,6 +22,8 @@ endif()
 # includes rts/build/cmake/Util.cmake & rts/build/cmake/PreferStaticLibs.cmake
 include(Util)
 include(PreferStaticLibs)
+include(IncludeForVcpkg)
+include(FindLibsForVcpkg)
 
 # check for minimal gcc version
 set(MIN_GCC_VER "5.4")
@@ -148,6 +155,9 @@ else  (UNIX AND NOT MINGW)
 		message(WARNING "Compiling for windows. MINGWLIBS '${MINGWLIBS}' is not a valid directory, trying system libs")
 	endif ()
 
+	if(MINGW)
+		add_definitions(-DGLEW_STATIC -DIL_STATIC_LIB)
+	endif()
 
 	add_definitions(-D_WIN32_WINNT=0x502) ## vista is minimum due to InterlockedIncrement64
 	add_definitions(-D__USE_MINGW_ANSI_STDIO=1) ## use __mingw_sprintf instead of __builtin_sprintf (it's used by lua in a synced way, and builtin doesn't sync)
@@ -243,9 +253,9 @@ endif (WIN32)
 
 # Note the missing REQUIRED, as headless & dedi may not depend on those.
 #  So req. checks are done in the build target's CMakeLists.txt.
-find_package(SDL2)
+find_vcpkg_static(SDL2 SDL_LIBRARY_VCPKG)
+find_vcpkg_static(DevIL IL_LIBRARY_VCPKG)
 
-find_package_static(DevIL)
 if    (PREFER_STATIC_LIBS)
 	# dependencies of DevIL
 	find_package_static(JPEG REQUIRED)
@@ -377,7 +387,7 @@ option(ENABLE_STREFLOP "build Spring with streflop support (REQUIRED FOR MULTIPL
 
 if (ENABLE_STREFLOP)
 ## note: is removed in ./AI/CMakeLists.txt since it would break AI compilation
-	if (HAS_I686_FLAG_ OR HAS_X86_64_FLAG_)
+	if (HAS_I686_FLAG_ OR HAS_X86_64_FLAG_ OR MSVC)
 		add_definitions(-DSTREFLOP_SSE)
 		message(STATUS "Build with streflop support (using SSE implementation)")
 	else ()
@@ -432,10 +442,10 @@ if    (MSVC)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
 	set(MSVC_CXX_FLAGS "/wd4146 /wd4711")
 
-	set(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG}                       /MP ${MSVC_CXX_FLAGS} ${CXX_DEBUG_DEFINES}")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /O2 /Ob2 /GL /MP ${MSVC_CXX_FLAGS} ${CXX_RELWITHDEBINFO_DEFINES}")
-	set(CMAKE_CXX_FLAGS_RELEASE         "${CMAKE_CXX_FLAGS_RELEASE}        /O2 /Ob2 /GL /MP ${MSVC_CXX_FLAGS} ${CXX_RELEASE_DEFINES}")
-	set(CMAKE_CXX_FLAGS_PROFILE         "${CMAKE_CXX_FLAGS_PROFILE}        /O2 /Ob2 /GL /MP ${MSVC_CXX_FLAGS} ${CXX_PROFILE_DEFINES}")
+	set(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG}                       /MTd ${MSVC_CXX_FLAGS} ${CXX_DEBUG_DEFINES}")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /O2 /Ob2 /GL /MT ${MSVC_CXX_FLAGS} ${CXX_RELWITHDEBINFO_DEFINES}")
+	set(CMAKE_CXX_FLAGS_RELEASE         "${CMAKE_CXX_FLAGS_RELEASE}        /O2 /Ob2 /GL /MT ${MSVC_CXX_FLAGS} ${CXX_RELEASE_DEFINES}")
+	set(CMAKE_CXX_FLAGS_PROFILE         "${CMAKE_CXX_FLAGS_PROFILE}        /O2 /Ob2 /GL /MT ${MSVC_CXX_FLAGS} ${CXX_PROFILE_DEFINES}")
 
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE        "${CMAKE_EXE_LINKER_FLAGS_RELEASE}        /LTCG")
 	set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LTCG")

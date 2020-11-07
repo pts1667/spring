@@ -4,7 +4,10 @@
 remove_flag("-fsignaling-nans")
 
 INCLUDE_DIRECTORIES(BEFORE ../streflop include)
-FIND_PACKAGE_STATIC(GLEW 1.5.1 REQUIRED) #FIXME: LuaUser.cpp requires glew...
+find_vcpkg_static_ver(GLEW 1.5.1 GLEW_LIBRARY_VCPKG) #FIXME: LuaUser.cpp requires glew...
+if (NOT GLEW_FOUND)
+	find_vcpkg_static(GLEW GLEW_LIBRARY_VCPKG)
+endif()
 INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR})
 
 SET(luaSources
@@ -42,11 +45,12 @@ SET(luaSources
 	)
 
 ADD_LIBRARY(lua STATIC EXCLUDE_FROM_ALL ${luaSources})
+find_libs_for_vcpkg(lua)
 
 if (ENABLE_STREFLOP)
-TARGET_LINK_LIBRARIES(lua streflop)
+TARGET_LINK_LIBRARIES(lua PRIVATE streflop)
 else ()
-TARGET_LINK_LIBRARIES(lua)
+# TARGET_LINK_LIBRARIES(lua)
 endif ()
 
 if (UNIX)

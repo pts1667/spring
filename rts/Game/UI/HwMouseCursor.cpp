@@ -1,6 +1,7 @@
 /* This file is part of the Spring engine (GPL v2 or later), see LICENSE.html */
 
 #include "System/Platform/Win/win32.h"
+#include "System/CompileSizeChecker.h"
 #include "Rendering/GlobalRendering.h"
 
 #if defined(__APPLE__) || defined(HEADLESS)
@@ -20,6 +21,7 @@
 #include "System/bitops.h"
 #include "System/Log/ILog.h"
 #include "System/SpringMath.h"
+#include "System/CompileSizeChecker.h"
 
 #include <SDL_config.h>
 #include <SDL_syswm.h>
@@ -175,7 +177,7 @@ private:
 
 
 IHardwareCursor* IHardwareCursor::Alloc(void* mem) {
-	static_assert(sizeof(HardwareCursor) <= CMouseCursor::HWC_MEM_SIZE, "");
+	CompileSizeChecker<HardwareCursor, decltype(CMouseCursor::HWC_MEM_SIZE), sizeof(HardwareCursor), CMouseCursor::HWC_MEM_SIZE>::MustBeLessThan();
 	return (new (mem) HardwareCursor());
 }
 

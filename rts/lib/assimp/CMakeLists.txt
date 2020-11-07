@@ -34,7 +34,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 SET(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+CMAKE_MINIMUM_REQUIRED( VERSION 3.0 )
 PROJECT( Assimp )
 
 # All supported options ###############################################
@@ -295,9 +295,9 @@ ENDIF( SYSTEM_IRRXML )
 
 # Search for external dependencies, and build them from source if not found
 # Search for zlib
-# IF ( NOT ASSIMP_BUILD_ZLIB )
-    # find_package(ZLIB)
-# ENDIF( NOT ASSIMP_BUILD_ZLIB )
+find_vcpkg(ZLIB ZLIB_LIBRARY_VCPKG)
+set(ZLIB_LIBRARIES_LINKED -lz)
+include_directories(${ZLIB_INCLUDE_DIR})
 
 # IF( NOT ZLIB_FOUND )
   # message(STATUS "compiling zlib from souces")
@@ -405,7 +405,7 @@ IF ( ASSIMP_BUILD_ASSIMP_TOOLS )
   # Why assimp_qt_viewer/CMakeLists.txt still contain similar check?
   # Because viewer can be build independently of Assimp.
   FIND_PACKAGE(Qt5Widgets QUIET)
-  FIND_PACKAGE(DevIL QUIET)
+  find_vcpkg(DevIL IL_LIBRARY_VCPKG)
   FIND_PACKAGE(OpenGL QUIET)
   IF ( Qt5Widgets_FOUND AND IL_FOUND AND OPENGL_FOUND)
     ADD_SUBDIRECTORY( tools/assimp_qt_viewer/ )

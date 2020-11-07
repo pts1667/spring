@@ -61,7 +61,7 @@ foreach(var ASSIMP_BUILD_STATIC_LIB ASSIMP_NO_EXPORT)
 endforeach()
 
 ADD_SUBDIRECTORY(assimp)
-target_compile_definitions(assimp PRIVATE -DASSIMP_BUILD_NO_OWN_ZLIB)
+# target_compile_definitions(assimp PRIVATE -DASSIMP_BUILD_NO_OWN_ZLIB)
 
 # hide assimp compile warnings with g++
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

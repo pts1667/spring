@@ -51,7 +51,7 @@ if    (MINGW OR APPLE)
 	# OS X:
 	# Cocoa requires the SDL libary, whenever the SDL headers are used,
 	# due to some #define magic, which is practically impossible to workaround.
-	find_package(SDL2 REQUIRED)
+	find_vcpkg_static(SDL2 SDL_LIBRARY_VCPKG)
 	include_directories(${SDL2_INCLUDE_DIR})
 	if("${SDL2_VERSION_STRING}" VERSION_LESS "2")
 		message(FATAL_ERROR "Found SDL v${SDL2_VERSION_STRING} while 2 is required!")
@@ -170,12 +170,14 @@ add_executable(engine-dedicated
 		${ENGINE_ICON}
 		main
 	)
-target_link_libraries(engine-dedicated ${engineDedicatedLibraries})
+
+find_libs_for_vcpkg(engine-dedicated)
+target_link_libraries(engine-dedicated PRIVATE ${engineDedicatedLibraries})
 if    (MINGW)
-	target_link_libraries(engine-dedicated ${WS2_32_LIBRARY} ${IMAGEHLP_LIBRARY} ${IPHLPAPI_LIBRARY} ${WINMM_LIBRARY})
+	target_link_libraries(engine-dedicated PRIVATE ${WS2_32_LIBRARY} ${IMAGEHLP_LIBRARY} ${IPHLPAPI_LIBRARY} ${WINMM_LIBRARY})
 endif (MINGW)
 if    (MSVC)
-	target_link_libraries(engine-dedicated ${DBGHELP_LIBRARY})
+	target_link_libraries(engine-dedicated PRIVATE ${DBGHELP_LIBRARY})
 endif (MSVC)
 add_dependencies(engine-dedicated generateVersionFiles)
 

@@ -90,7 +90,11 @@ EndIf (NOT DEFINED IEEE_FP_FLAG)
 
 
 If    (NOT DEFINED CXX17_FLAGS)
-	CHECK_AND_ADD_FLAGS(CXX17_FLAGS "-std=c++17")
+	If (MSVC)
+		Set(CXX17_FLAGS "/std:c++17")
+	Else()
+		CHECK_AND_ADD_FLAGS(CXX17_FLAGS "-std=c++17")
+	EndIf()
 EndIf (NOT DEFINED CXX17_FLAGS)
 
 
@@ -113,7 +117,11 @@ IF    (NOT MSVC AND NOT DEFINED MARCH)
 	# 64bit
 	if    ((CMAKE_SIZEOF_VOID_P EQUAL 8) AND (NOT MARCH))
 		# always syncs with 32bit
-		check_cxx_accepts_flag("-march=x86-64" HAS_X86_64_FLAG_)
+		if (MSVC)
+			set(HAS_X86_64_FLAG_ true)
+		else()
+			check_cxx_accepts_flag("-march=x86-64" HAS_X86_64_FLAG_)
+		endif()
 		if    (HAS_X86_64_FLAG_)
 			set(MARCH "x86-64")
 		endif (HAS_X86_64_FLAG_)

@@ -12,6 +12,7 @@
 #include "System/FileSystem/FileSystem.h"
 #include "System/Log/ILog.h"
 #include "System/StringUtil.h"
+#include "System/CompileSizeChecker.h"
 
 void CUnitScriptFactory::InitStatic()
 {
@@ -45,13 +46,13 @@ CUnitScript* CUnitScriptFactory::CreateScript(CUnit* unit, const UnitDef* udef)
 
 CUnitScript* CUnitScriptFactory::CreateCOBScript(CUnit* unit, CCobFile* F)
 {
-	static_assert(sizeof(CCobInstance) <= sizeof(unit->usMemBuffer), "");
+	CompileSizeChecker<CCobInstance, size_t, sizeof(CCobInstance), CUnit::usMemBufferSize>::MustBeLessThan();
 	return (new (unit->usMemBuffer) CCobInstance(F, unit));
 }
 
 CUnitScript* CUnitScriptFactory::CreateLuaScript(CUnit* unit, lua_State* L)
 {
-	static_assert(sizeof(CLuaUnitScript) <= sizeof(unit->usMemBuffer), "");
+	CompileSizeChecker<CLuaUnitScript, size_t, sizeof(CLuaUnitScript), CUnit::usMemBufferSize>::MustBeLessThan();
 	return (new (unit->usMemBuffer) CLuaUnitScript(L, unit));
 }
 

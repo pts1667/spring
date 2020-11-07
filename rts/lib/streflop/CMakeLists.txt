@@ -77,11 +77,18 @@ if   (NOT MSVC)
 endif(NOT MSVC)
 SET_SOURCE_FILES_PROPERTIES(${libm_flt32_source} PROPERTIES COMPILE_FLAGS "-DLIBM_COMPILING_FLT32 ${cxxflags}")
 
+if (MSVC)
+	SET(streflop_asm_src "FPUSettingsASM.asm")
+else()
+	SET(streflop_asm_src "")
+endif()
+
 ADD_LIBRARY(streflop STATIC EXCLUDE_FROM_ALL
 	SMath.cpp
 	Random.cpp
 	streflopC.cpp
 	${libm_flt32_source}
+	${streflop_asm_src}
 	)
 set_target_properties(streflop PROPERTIES COMPILE_FLAGS "${PIC_FLAG}")
 #TODO do not use -fPIC for streflop (decreases performance)

@@ -54,7 +54,7 @@ endif (WIN32)
 # define the fPic compiler flag
 if     (APPLE)
 	set(PIC_FLAG "-fPIC")
-elseif (MINGW)
+elseif (MINGW OR MSVC)
 	set(PIC_FLAG "")
 else   ()
 	if (CMAKE_SIZEOF_VOID_P EQUAL 8) # add fpic flag on 64 bit platforms
