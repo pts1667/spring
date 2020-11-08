@@ -11,7 +11,7 @@ project(Spring)
 
 # MSVC doesn't allow inline asm for x64 targets
 if (MSVC)
-	enable_language(ASM_MASM)
+	enable_language(ASM_NASM)
 endif()
 
 # dummy so that qtcreator shows all files (even those of windows)

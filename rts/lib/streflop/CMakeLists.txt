@@ -75,13 +75,20 @@ if   (NOT MSVC)
 		SET(cxxflags "${cxxflags} -mfpmath=sse -msse")
 	endif (NOT $ENV{CXX} MATCHES "icpc")
 endif(NOT MSVC)
-SET_SOURCE_FILES_PROPERTIES(${libm_flt32_source} PROPERTIES COMPILE_FLAGS "-DLIBM_COMPILING_FLT32 ${cxxflags}")
 
 if (MSVC)
 	SET(streflop_asm_src "FPUSettingsASM.asm")
+
+	if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
+		SET(cxxflags "${cxxflags} /w /fp:strict /DMSVC_FP_STRICT /Od")
+	else()
+		SET(cxxflags "${cxxflags} /w /fp:strict /DMSVC_FP_STRICT /O2")
+	endif()
 else()
 	SET(streflop_asm_src "")
 endif()
+
+SET_SOURCE_FILES_PROPERTIES(${libm_flt32_source} PROPERTIES COMPILE_FLAGS "-DLIBM_COMPILING_FLT32 ${cxxflags}")
 
 ADD_LIBRARY(streflop STATIC EXCLUDE_FROM_ALL
 	SMath.cpp

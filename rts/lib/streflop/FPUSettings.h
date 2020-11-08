@@ -50,7 +50,9 @@
 #include "softfloat/softfloat.h"
 #endif
 
-#include "FPUSettingsASM.h"
+#if defined(_MSC_VER)
+    #include <xmmintrin.h>
+#endif
 
 namespace streflop {
 
@@ -134,10 +136,30 @@ enum FPU_RoundMode {
 
 // plan for portability
 #if defined(_MSC_VER)
-#define STREFLOP_FSTCW(cw) do { _streflop_fstcw((short*) &(cw)); } while (0)
-#define STREFLOP_FLDCW(cw) do { _streflop_fldcw((short*) &(cw)); } while (0)
-#define STREFLOP_STMXCSR(cw) do { _streflop_stmxcsr((int*) &(cw)); } while (0)
-#define STREFLOP_LDMXCSR(cw) do { _streflop_ldmxcsr((int*) &(cw)); } while (0)
+#include "FPUSettingsASM.h"
+
+inline void STREFLOP_FSTCW(unsigned short& cw) {
+    unsigned short tmp;
+    tmp = _streflop_fstcw();
+    cw = tmp;
+}
+
+inline void STREFLOP_FLDCW(unsigned short cw) {
+    unsigned short tmp = cw;
+    _streflop_fldcw(tmp);
+}
+
+inline void STREFLOP_STMXCSR(unsigned int& cw) {
+    unsigned int tmp;
+    tmp = _mm_getcsr();
+    cw = tmp;
+}
+
+inline void STREFLOP_LDMXCSR(unsigned int cw) {
+    unsigned int tmp = cw;
+    _mm_setcsr(tmp);
+}
+
 #else
 #define STREFLOP_FSTCW(cw) do { asm volatile ("fstcw %0" : "=m" (cw) : ); } while (0)
 #define STREFLOP_FLDCW(cw) do { asm volatile ("fclex \n fldcw %0" : : "m" (cw)); } while (0)
@@ -199,7 +221,7 @@ inline int fegetenv(fpenv_t *envp) {
 }
 
 /// Sets FP env from the given structure
-inline int fesetenv(const fpenv_t *envp) {
+inline int fesetenv(fpenv_t *envp) {
     // check that default env exists, otherwise save it now
     if (!FE_DFL_ENV) STREFLOP_FSTCW(FE_DFL_ENV);
     // Now overwrite current env by argument
@@ -273,7 +295,7 @@ inline int feraiseexcept(FPU_Exceptions excepts) {
     x87_mode &= ~( excepts ); // generate error for selection
     STREFLOP_FLDCW(x87_mode);
 
-    int sse_mode;
+    unsigned int sse_mode;
     STREFLOP_STMXCSR(sse_mode);
     sse_mode &= ~( excepts << 7 ); // generate error for selection
     STREFLOP_LDMXCSR(sse_mode);
@@ -289,7 +311,7 @@ inline int feclearexcept(int excepts) {
     x87_mode |= excepts;
     STREFLOP_FLDCW(x87_mode);
 
-    int sse_mode;
+    unsigned int sse_mode;
     STREFLOP_STMXCSR(sse_mode);
     sse_mode |= excepts << 7;
     STREFLOP_LDMXCSR(sse_mode);
@@ -299,14 +321,14 @@ inline int feclearexcept(int excepts) {
 
 /// Get current rounding mode
 inline int fegetround() {
-    int sse_mode;
+    unsigned int sse_mode;
     STREFLOP_STMXCSR(sse_mode);
     return (sse_mode>>3) & 0x00000C00;
 }
 
 /// Set a new rounding mode
 inline int fesetround(FPU_RoundMode roundMode) {
-    int sse_mode;
+    unsigned int sse_mode;
     STREFLOP_STMXCSR(sse_mode);
     sse_mode &= 0xFFFF9FFF; // clear current mode
     sse_mode |= roundMode<<3; // sets new mode
@@ -316,8 +338,8 @@ inline int fesetround(FPU_RoundMode roundMode) {
 
 /// stores both x87 and SSE words
 struct fpenv_t {
-    int sse_mode;
-    short int x87_mode;
+    unsigned int sse_mode;
+    unsigned short x87_mode;
 };
 
 /// Default env. Defined in SMath.cpp, structs are initialized to 0
@@ -338,7 +360,7 @@ inline int fegetenv(fpenv_t *envp) {
 }
 
 /// Sets FP env from the given structure
-inline int fesetenv(const fpenv_t *envp) {
+inline int fesetenv(fpenv_t *envp) {
     // check that default env exists, otherwise save it now
     if (!FE_DFL_ENV.x87_mode) STREFLOP_FSTCW(FE_DFL_ENV.x87_mode);
     // Now overwrite current env by argument
@@ -373,7 +395,7 @@ template<> inline void streflop_init<Simple>() {
     x87_mode &= 0xFCFF; // 32 bits internal operations
     STREFLOP_FLDCW(x87_mode);
 
-    int sse_mode;
+    unsigned int sse_mode;
     STREFLOP_STMXCSR(sse_mode);
 #if defined(STREFLOP_NO_DENORMALS)
     sse_mode |= 0x8040; // set DAZ and FTZ
@@ -391,7 +413,7 @@ template<> inline void streflop_init<Double>() {
     x87_mode |= 0x0200; // 64 bits internal operations
     STREFLOP_FLDCW(x87_mode);
 
-    int sse_mode;
+    unsigned int sse_mode;
     STREFLOP_STMXCSR(sse_mode);
 #if defined(STREFLOP_NO_DENORMALS)
     sse_mode |= 0x8040; // set DAZ and FTZ
@@ -410,7 +432,7 @@ template<> inline void streflop_init<Extended>() {
     x87_mode |= 0x0300; // 80 bits internal operations
     STREFLOP_FLDCW(x87_mode);
 
-    int sse_mode;
+    unsigned int sse_mode;
     STREFLOP_STMXCSR(sse_mode);
 #if defined(STREFLOP_NO_DENORMALS)
     sse_mode |= 0x8040; // set DAZ and FTZ
@@ -490,7 +512,7 @@ inline int fegetenv(fpenv_t *envp) {
 }
 
 /// Sets FP env from the given structure
-inline int fesetenv(const fpenv_t *envp) {
+inline int fesetenv(fpenv_t *envp) {
     // check that default env exists, otherwise save it now
     if (FE_DFL_ENV.tininess==42) {
         // First use: save default environment now

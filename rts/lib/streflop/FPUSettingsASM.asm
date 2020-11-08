@@ -1,25 +1,26 @@
-; masm file
+; msvc doesn't allowed inline asm in x64 compiles
 
-.CODE
+section .text
+global _streflop_fstcw
+global _streflop_fldcw
 
-_streflop_fstcw PROC PUBLIC input:QWORD
-  fstcw WORD PTR input
+_streflop_fstcw:
+  push    rbp
+  mov     rbp, rsp
+  fstcw   [rbp-2]
+  movzx   eax, WORD [rbp-2]
+  pop     rbp
   ret
-_streflop_fstcw ENDP
 
-_streflop_fldcw PROC PUBLIC input:QWORD
-  fclex
-  fldcw WORD PTR input
+_streflop_fldcw:
+  push    rbp
+  mov     rbp, rsp
+  mov     eax, edi
+  mov     [rbp-20], ax
+  movzx   eax, WORD [rbp-20]
+  mov     [rbp-2], ax
+  fclex 
+  fldcw   [rbp-2]
+  nop
+  pop     rbp
   ret
-_streflop_fldcw ENDP
-
-_streflop_stmxcsr PROC PUBLIC input:QWORD
-  stmxcsr DWORD PTR input
-  ret
-_streflop_stmxcsr ENDP
-
-_streflop_ldmxcsr PROC PUBLIC input:QWORD
-  ldmxcsr DWORD PTR input
-  ret
-_streflop_ldmxcsr ENDP
-END

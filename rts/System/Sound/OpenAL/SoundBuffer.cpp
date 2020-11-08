@@ -137,6 +137,14 @@ bool SoundBuffer::LoadWAV(const std::string& file, const std::vector<std::uint8_
 		header->datalen = std::uint32_t(buffer.size() - sizeof(WAVHeader))&(~std::uint32_t((header->BitsPerSample*header->channels)/8 -1));
 	}
 
+	if (header->datalen == 0) {
+		LOG_L(L_ERROR,
+			"Buffer data is empty",
+			__func__, file.c_str());
+
+		return false;
+	}
+
 	if (!AlGenBuffer(file, format, &buffer[sizeof(WAVHeader)], header->datalen, header->SamplesPerSec))
 		LOG_L(L_WARNING, "[%s(%s)] failed generating buffer", __func__, file.c_str());
 

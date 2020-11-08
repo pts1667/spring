@@ -3,9 +3,7 @@
 #if defined(_MSC_VER)
 extern "C"
 {
-  extern void _streflop_fstcw(short *tmp);
-  extern void _streflop_fldcw(short *tmp);
-  extern void _streflop_stmxcsr(int *tmp);
-  extern void _streflop_ldmxcsr(int *tmp);
+  extern unsigned short _streflop_fstcw();
+  extern void _streflop_fldcw(unsigned short tmp);
 }
 #endif
